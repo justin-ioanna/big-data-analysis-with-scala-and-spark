@@ -39,33 +39,43 @@ class WikipediaSuite {
     * @tparam A Type of the list elements
     */
   def assertSameElements[A](actual: List[A], expected: List[A]): Unit = {
-    val givenSet = actual.toSet
+    val givenSet    = actual.toSet
     val expectedSet = expected.toSet
 
     val unexpected = givenSet -- expectedSet
-    val missing = expectedSet -- givenSet
+    val missing    = expectedSet -- givenSet
 
     val noUnexpectedElements = unexpected.isEmpty
-    val noMissingElements = missing.isEmpty
+    val noMissingElements    = missing.isEmpty
 
     val noMatchString =
       s"""
          |Expected: ${previewList(expected)}
          |Actual:   ${previewList(actual)}""".stripMargin
 
-    assert(noUnexpectedElements,
+    assert(
+      noUnexpectedElements,
       s"""|$noMatchString
-          |The given collection contains some unexpected elements: ${previewList(unexpected.toList, 5)}""".stripMargin)
+          |The given collection contains some unexpected elements: ${previewList(
+           unexpected.toList,
+           5
+         )}""".stripMargin
+    )
 
-    assert(noMissingElements,
+    assert(
+      noMissingElements,
       s"""|$noMatchString
-          |The given collection is missing some expected elements: ${previewList(missing.toList, 5)}""".stripMargin)
+          |The given collection is missing some expected elements: ${previewList(missing.toList, 5)}""".stripMargin
+    )
   }
 
   // Conditions:
   // (1) the language stats contain the same elements
   // (2) they are ordered (and the order doesn't matter if there are several languages with the same count)
-  def assertEquivalentAndOrdered(actual: List[(String, Int)], expected: List[(String, Int)]): Unit = {
+  def assertEquivalentAndOrdered(
+      actual: List[(String, Int)],
+      expected: List[(String, Int)]
+  ): Unit = {
     // (1)
     assertSameElements(actual, expected)
     // (2)
@@ -76,67 +86,84 @@ class WikipediaSuite {
   }
 
   @Test def `'occurrencesOfLang' should work for (specific) RDD with one element`: Unit = {
-    assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
+    assert(
+      initializeWikipediaRanking(),
+      " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?"
+    )
     val rdd = sc.parallelize(Seq(WikipediaArticle("title", "Java Jakarta")))
     val res = (occurrencesOfLang("Java", rdd) == 1)
     assert(res, "occurrencesOfLang given (specific) RDD with one element should equal to 1")
   }
 
   @Test def `'rankLangs' should work for RDD with two elements`: Unit = {
-    assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
+    assert(
+      initializeWikipediaRanking(),
+      " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?"
+    )
     val langs = List("Scala", "Java")
-    val rdd = sc.parallelize(List(WikipediaArticle("1", "Scala is great"), WikipediaArticle("2", "Java is OK, but Scala is cooler")))
+    val rdd = sc.parallelize(
+      List(
+        WikipediaArticle("1", "Scala is great"),
+        WikipediaArticle("2", "Java is OK, but Scala is cooler")
+      )
+    )
     val ranked = rankLangs(langs, rdd)
-    val res = ranked.head._1 == "Scala"
+    val res    = ranked.head._1 == "Scala"
     assert(res)
   }
 
   @Test def `'makeIndex' creates a simple index with two entries`: Unit = {
-    assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
+    assert(
+      initializeWikipediaRanking(),
+      " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?"
+    )
     val langs = List("Scala", "Java")
     val articles = List(
-        WikipediaArticle("1","Groovy is pretty interesting, and so is Erlang"),
-        WikipediaArticle("2","Scala and Java run on the JVM"),
-        WikipediaArticle("3","Scala is not purely functional")
-      )
-    val rdd = sc.parallelize(articles)
+      WikipediaArticle("1", "Groovy is pretty interesting, and so is Erlang"),
+      WikipediaArticle("2", "Scala and Java run on the JVM"),
+      WikipediaArticle("3", "Scala is not purely functional")
+    )
+    val rdd   = sc.parallelize(articles)
     val index = makeIndex(langs, rdd)
-    val res = index.count() == 2
+    val res   = index.count() == 2
     assert(res)
   }
 
   @Test def `'rankLangsUsingIndex' should work for a simple RDD with three elements`: Unit = {
-    assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
+    assert(
+      initializeWikipediaRanking(),
+      " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?"
+    )
     val langs = List("Scala", "Java")
     val articles = List(
-        WikipediaArticle("1","Groovy is pretty interesting, and so is Erlang"),
-        WikipediaArticle("2","Scala and Java run on the JVM"),
-        WikipediaArticle("3","Scala is not purely functional")
-      )
-    val rdd = sc.parallelize(articles)
-    val index = makeIndex(langs, rdd)
+      WikipediaArticle("1", "Groovy is pretty interesting, and so is Erlang"),
+      WikipediaArticle("2", "Scala and Java run on the JVM"),
+      WikipediaArticle("3", "Scala is not purely functional")
+    )
+    val rdd    = sc.parallelize(articles)
+    val index  = makeIndex(langs, rdd)
     val ranked = rankLangsUsingIndex(index)
-    val res = (ranked.head._1 == "Scala")
+    val res    = (ranked.head._1 == "Scala")
     assert(res)
   }
 
   @Test def `'rankLangsReduceByKey' should work for a simple RDD with five elements`: Unit = {
-    assert(initializeWikipediaRanking(), " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?")
+    assert(
+      initializeWikipediaRanking(),
+      " -- did you fill in all the values in WikipediaRanking (conf, sc, wikiRdd)?"
+    )
     val langs = List("Scala", "Java", "Groovy", "Haskell", "Erlang")
     val articles = List(
-        WikipediaArticle("1","Groovy is pretty interesting, and so is Erlang"),
-        WikipediaArticle("2","Scala and Java run on the JVM"),
-        WikipediaArticle("3","Scala is not purely functional"),
-        WikipediaArticle("4","The cool kids like Haskell more than Java"),
-        WikipediaArticle("5","Java is for enterprise developers")
-      )
-    val rdd = sc.parallelize(articles)
+      WikipediaArticle("1", "Groovy is pretty interesting, and so is Erlang"),
+      WikipediaArticle("2", "Scala and Java run on the JVM"),
+      WikipediaArticle("3", "Scala is not purely functional"),
+      WikipediaArticle("4", "The cool kids like Haskell more than Java"),
+      WikipediaArticle("5", "Java is for enterprise developers")
+    )
+    val rdd    = sc.parallelize(articles)
     val ranked = rankLangsReduceByKey(langs, rdd)
-    val res = (ranked.head._1 == "Java")
+    val res    = (ranked.head._1 == "Java")
     assert(res)
   }
-
-
-
   @Rule def individualTestTimeout = new org.junit.rules.Timeout(100 * 1000)
 }
