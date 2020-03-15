@@ -8,17 +8,6 @@ trigger:
     - timeusage/*
     - wikipedia/*
 
-pr:
-  autoCancel: false
-  branches:
-    include:
-    - master
-  paths:
-    include:
-    - stackoverflow/*
-    - timeusage/*
-    - wikipedia/*
-
 jobs:
 
 - job: stackoverflow
