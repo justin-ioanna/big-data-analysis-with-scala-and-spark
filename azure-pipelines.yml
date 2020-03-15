@@ -1,0 +1,49 @@
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - stackoverflow/*
+    - timeusage/*
+    - wikipedia/*
+
+pr:
+  autoCancel: false
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - stackoverflow/*
+    - timeusage/*
+    - wikipedia/*
+
+jobs:
+
+- job: stackoverflow
+  timeoutInMinutes: 5
+  pool:
+    vmImage: 'ubuntu-16.04'
+  container: hseeberger/scala-sbt:8u222_1.3.7_2.12.10
+  steps:
+  - bash: cd stackoverflow && sbt test
+    displayName: 'Run unit tests'
+
+- job: timeusage
+  timeoutInMinutes: 5
+  pool:
+    vmImage: 'ubuntu-16.04'
+  container: hseeberger/scala-sbt:8u222_1.3.7_2.12.10
+  steps:
+  - bash: cd timeusage && sbt test
+    displayName: 'Run unit tests'
+
+- job: wikipedia
+  timeoutInMinutes: 5
+  pool:
+    vmImage: 'ubuntu-16.04'
+  container: hseeberger/scala-sbt:8u222_1.3.7_2.12.10
+  steps:
+  - bash: cd wikipedia && sbt test
+    displayName: 'Run unit tests'
