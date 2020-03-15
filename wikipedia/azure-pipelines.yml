@@ -1,10 +1,13 @@
+variables:
+  project: wikipedia
+
 trigger:
   branches:
     include:
     - master
   paths:
     include:
-    - wikipedia/*
+    - $(project)/*
 
 pr:
   autoCancel: false
@@ -13,7 +16,7 @@ pr:
     - master
   paths:
     include:
-    - wikipedia/*
+    - $(project)/*
 
 jobs:
 - job: Test
@@ -22,5 +25,5 @@ jobs:
     vmImage: 'ubuntu-16.04'
   container: hseeberger/scala-sbt:8u222_1.3.7_2.12.10
   steps:
-  - bash: cd wikipedia && sbt test
+  - bash: cd $(project) && sbt test
     displayName: 'Run unit tests'
