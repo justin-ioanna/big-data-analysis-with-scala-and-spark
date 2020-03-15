@@ -3,6 +3,7 @@ package wikipedia
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
+import org.apache.spark.rdd.RDD
 import org.junit._
 
 class WikipediaSuite {
@@ -82,6 +83,16 @@ class WikipediaSuite {
     assert(
       !(actual zip actual.tail).exists({ case ((_, occ1), (_, occ2)) => occ1 < occ2 }),
       "The given elements are not in descending order"
+    )
+  }
+
+  @Test def `'occurrencesOfLang' should work for empty RDD`: Unit = {
+    assert(occurrencesOfLang("scala", sc.emptyRDD[WikipediaArticle]) == 0)
+  }
+
+  @Test def `'occurrencesOfLang' shouldn't count languages that don't occur`: Unit = {
+    assert(
+      occurrencesOfLang("java", sc.parallelize(List(WikipediaArticle("1", "Scala is great")))) == 0
     )
   }
 
