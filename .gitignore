@@ -8,3 +8,6 @@ target/
 .metals/
 metals.sbt
 .bloop/
+
+# Data files
+*/src/main/resources/
